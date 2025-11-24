@@ -79,7 +79,7 @@ A_lat = [ a11  a12  0   0 ;
           0    1    0   0 ];
 
 
-B_lat = [ Cf/m ;
+B_lat = [ Cf/(m*Vx) ;
           Cf*Lf/Iz ;
           0 ;
           0 ];
