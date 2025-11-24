@@ -68,14 +68,16 @@ Vx = -3; % reverse driving
 
 % Continuous-time lateral model 
 a11 = -(Cf+Cr)/(m*Vx);
-a12 = -(m*Vx + (Cf*Lf - Cr*Lr))/(m*Vx);
+a12 = (Cr*Lr - Cf*Lf)/(m*Vx^2) - 1;     
 a21 = (Cr*Lr - Cf*Lf)/Iz;
 a22 = -(Cf*Lf^2 + Cr*Lr^2)/(Iz*Vx);
 
+
 A_lat = [ a11  a12  0   0 ;
           a21  a22  0   0 ;
-          Vx   1    0   Vx;
+          Vx   0    0   Vx;
           0    1    0   0 ];
+
 
 B_lat = [ Cf/m ;
           Cf*Lf/Iz ;
@@ -97,6 +99,7 @@ Cd = sysd.C;
 Dd = sysd.D;
 
 % Horizon Length
+ny = size(Cd,1);   % 출력 개수
 Np = 10;   % Prediction horizon
 Nc = 3;    % Control horizon
 
@@ -104,7 +107,8 @@ Nc = 3;    % Control horizon
 Qy   = 1;     % (y-y_ref)^2 weight
 Rdu  = 0.1;   % (Δδ)^2 weight
 
-mpc_rev.Weights.OutputVariables          = Qy;
+mpc_rev = mpc(sysd,Ts_mpc,Np,Nc);
+mpc_rev.Weights.OutputVariables          = Qy * ones(1,ny);
 mpc_rev.Weights.ManipulatedVariables     = 0;
 mpc_rev.Weights.ManipulatedVariablesRate = Rdu;
 
@@ -114,7 +118,6 @@ delta_max =  25*pi/180;
 
 mpc_rev.MV.Min = delta_min;
 mpc_rev.MV.Max = delta_max;
-
 
 
 %% MPC Pedal Map
